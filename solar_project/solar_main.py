@@ -3,11 +3,8 @@
 
 import time
 import numpy as np
-
-
 import pygame as pg
 import thorpy
-
 import solar_vis as vis
 import solar_model as model
 import solar_input as input
@@ -86,7 +83,7 @@ def open_file():
     vis.calculate_scale_factor(max_distance)
 
 def save_file():
-    """
+    """Функция сохраняет параметры полёта в файл.
     """
     global space_objects
     global browser
@@ -119,7 +116,7 @@ def init_ui(screen):
     timer = thorpy.OneLineText("Seconds passed")
 
     button_load = thorpy.make_button(text="Load from file", func=open_file)
-    button_save = thor)py.make_button(text="Save to file", func=save_file)
+    button_save = thorpy.make_button(text="Save to file", func=save_file)
 
     box = thorpy.Box(elements=[
         slider,
@@ -146,8 +143,7 @@ def init_ui(screen):
     return menu, box, timer
 
 def main():
-    """Главная функция главного модуля.
-    Создаёт объекты графического дизайна библиотеки tkinter: окно, холст, фрейм с кнопками, кнопки.
+    """Главная функция главного модуля
     """
     
     global physical_time

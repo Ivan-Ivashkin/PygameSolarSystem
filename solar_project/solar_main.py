@@ -1,14 +1,14 @@
 # coding: utf-8
 # license: GPLv3
 
-import pygame as pg
-from solar_vis import *
-from solar_model import *
-from solar_input import *
-from solar_objects import *
-import thorpy
 import time
 import numpy as np
+import pygame as pg
+import thorpy
+import solar_vis as vis
+import solar_model as model
+import solar_input as input
+import solar_objects as objects
 
 timer = None
 
@@ -28,6 +28,14 @@ time_scale = 1000.0
 space_objects = []
 """Список космических объектов."""
 
+FPS = 60
+"""Колчество обновлений в секунду"""
+
+# def exception_hook():
+#     pg.quit()
+
+# sys.excepthook = exception_hook()
+
 def execution(delta):
     """Функция исполнения -- выполняется циклически, вызывая обработку всех небесных тел,
     а также обновляя их положение на экране.
@@ -36,7 +44,7 @@ def execution(delta):
     """
     global model_time
     global displayed_time
-    recalculate_space_objects_positions([dr.obj for dr in space_objects], delta)
+    model.recalculate_space_objects_positions([dr.obj for dr in space_objects], delta)
     model_time += delta
 
 
@@ -69,9 +77,19 @@ def open_file():
 
     model_time = 0.0
     in_filename = "solar_system.txt"
-    space_objects = read_space_objects_data_from_file(in_filename)
+    space_objects = input.read_space_objects_data_from_file(in_filename)
     max_distance = max([max(abs(obj.obj.x), abs(obj.obj.y)) for obj in space_objects])
-    calculate_scale_factor(max_distance)
+    vis.calculate_scale_factor(max_distance)
+
+def save_file():
+    """
+    """
+    global space_objects
+    global browser
+    global model_time
+
+    out_filename = "solar_system_out.txt"
+    input.write_space_objects_data_to_file(out_filename, space_objects)
 
 def handle_events(events, menu):
     global alive
@@ -96,7 +114,8 @@ def init_ui(screen):
     button_play = thorpy.make_button("Play", func=start_execution)
     timer = thorpy.OneLineText("Seconds passed")
 
-    button_load = thorpy.make_button(text="Load a file", func=open_file)
+    button_load = thorpy.make_button(text="Load from file", func=open_file)
+    button_save = thorpy.make_button(text="Save to file", func=save_file)
 
     box = thorpy.Box(elements=[
         slider,
@@ -104,6 +123,7 @@ def init_ui(screen):
         button_stop, 
         button_play, 
         button_load,
+        button_save,
         timer])
     reaction1 = thorpy.Reaction(reacts_to=thorpy.constants.THORPY_EVENT,
                                 reac_func=slider_reaction,
@@ -134,6 +154,7 @@ def main():
     global start_button
     global perform_execution
     global timer
+    global FPS
 
     print('Modelling started!')
     physical_time = 0
@@ -144,9 +165,10 @@ def main():
     height = 900
     screen = pg.display.set_mode((width, height))
     last_time = time.perf_counter()
-    drawer = Drawer(screen)
+    drawer = vis.Drawer(screen)
     menu, box, timer = init_ui(screen)
     perform_execution = True
+    last_update_time = 0
 
     while alive:
         handle_events(pg.event.get(), menu)
@@ -156,11 +178,17 @@ def main():
             text = "%d seconds passed" % (int(model_time))
             timer.set_text(text)
 
+        if cur_time - last_update_time > 0.05:
+            last_update_time = cur_time
+            drawer.update(space_objects, box)
+
         last_time = cur_time
-        drawer.update(space_objects, box)
-        time.sleep(1.0 / 60)
 
     print('Modelling finished!')
+    pg.quit()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        pg.quit()

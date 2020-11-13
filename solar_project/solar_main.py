@@ -119,7 +119,7 @@ def init_ui(screen):
     timer = thorpy.OneLineText("Seconds passed")
 
     button_load = thorpy.make_button(text="Load from file", func=open_file)
-    button_save = thorpy.make_button(text="Save to file", func=save_file)
+    button_save = thor)py.make_button(text="Save to file", func=save_file)
 
     box = thorpy.Box(elements=[
         slider,

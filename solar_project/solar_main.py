@@ -3,12 +3,16 @@
 
 import time
 import numpy as np
+
+
 import pygame as pg
 import thorpy
+
 import solar_vis as vis
 import solar_model as model
 import solar_input as input
 import solar_objects as objects
+
 
 timer = None
 
@@ -183,6 +187,7 @@ def main():
             drawer.update(space_objects, box)
 
         last_time = cur_time
+        #time.sleep(1.0 / FPS)
 
     print('Modelling finished!')
     pg.quit()

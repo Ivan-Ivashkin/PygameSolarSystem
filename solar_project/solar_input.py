@@ -115,6 +115,7 @@ def write_space_objects_data_to_file(output_filename, space_objects):
         for dobj in space_objects:
             so = dobj.obj
             out_file.write(f"{so.type} {so.R} {so.color} {so.m} {so.x} {so.y} {so.Vx} {so.Vy}\n")
+       
 
 
 if __name__ == "__main__":
